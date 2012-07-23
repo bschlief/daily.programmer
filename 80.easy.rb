@@ -50,11 +50,11 @@ puts "Initializing..."
 
 lines = Array.new
 lines_key = Array.new
-File.foreach("data/anagrams.txt") {
+File.foreach("data/anagrams.txt") do
   | line |
 	lines << line.chomp
 	lines_key << line.chomp.chars.sort.join
-}
+end
 
 puts "#{lines.length} lines read"
 
