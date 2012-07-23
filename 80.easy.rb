@@ -48,17 +48,12 @@
 
 puts "Initializing..."
 
-lines = Array.new
-lines_key = Array.new
-File.foreach("data/anagrams.txt") do
-  | line |
-	lines << line.chomp
-	lines_key << line.chomp.chars.sort.join
-end
+lines = IO.readlines("data/anagrams.txt").each { |line| line.chomp! }
+lines_key = lines.collect { |line| line.chars.sort.join }
 
 puts "#{lines.length} lines read"
 
-anaHash = Hash.new {|hash, key| hash[key] = [] }
+anaHash = Hash.new { |hash, key| hash[key] = [] }
 for i in 0..lines.length do 
   anaHash[lines_key[i]] << lines[i] 
 end
