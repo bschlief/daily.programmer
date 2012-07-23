@@ -46,4 +46,27 @@
 # fast lookup later.
 
 
+puts "Initializing..."
+
+lines = Array.new
+lines_key = Array.new
+File.foreach("data/anagrams.txt") {
+  | line |
+	lines << line.chomp
+	lines_key << line.chomp.chars.sort.join
+}
+
+puts "#{lines.length} lines read"
+
+anaHash = Hash.new {|hash, key| hash[key] = [] }
+for i in 0..lines.length do 
+  anaHash[lines_key[i]] << lines[i] 
+end
+
+while true do
+  print "Enter anagram searchword: "
+  word = gets
+  puts anaHash[word.chomp.chars.sort.join]
+end
+
 
