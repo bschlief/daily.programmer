@@ -44,28 +44,25 @@
 #
 # A bit heavy on the front end for processing, but will allow for very
 # fast lookup later.
-
-
 puts "Initializing..."
 
 time_beg = Time.now
 
-lines = IO.readlines("data/anagrams.txt").each { |line| line.chomp! }
-lines_key = lines.collect { |line| line.chars.sort.join.to_sym }
-
 ana_hash = Hash.new { |hash, key| hash[key] = [] }
-for i in 0..lines.length do 
-  ana_hash[lines_key[i]] << lines[i] 
+
+IO.readlines("data/anagrams.txt").each do |word|
+  word.chomp!
+  key = word.chars.sort.hash
+  ana_hash[key] << word
 end
 
 time_end = Time.now
-puts "#{ana_hash.keys.length} keys read in #{(time_end-time_beg)*1000} msec"
 
+puts "Read #{ana_hash.keys.length} keys in #{(time_end-time_beg) * 1000} msec"
 
-while true do
-  print "Enter anagram searchword: "
-  word = gets
-  puts ana_hash[word.chomp.chars.sort.join.to_sym]
+loop do
+print "Enter anagram searchword: "
+  word = gets.chomp
+  key = word.chars.sort.hash
+  puts ana_hash[key]
 end
-
-
