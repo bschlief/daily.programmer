@@ -51,8 +51,8 @@ ARGF.each { |line| arr << line.chomp!.scan(/\d+/).map { |s| s.to_i } }
 arr_t = arr.transpose
 
 # sum as a reduction for each row, and the columns
-arr_sums   = arr.map   { |a| a.inject { |sum,n| sum + n } }
-arr_t_sums = arr_t.map { |a| a.inject { |sum,n| sum + n } }
+arr_sums   = arr.map   { |a| a.inject(:+) }
+arr_t_sums = arr_t.map { |a| a.inject(:+) }
 
 # print Rows and Columns
 printf "Rows:"
