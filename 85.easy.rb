@@ -42,10 +42,9 @@
 #  For bonus points, format your output matrices nicely (align the columns, draw boxes with - and |...)
 # Retrieved 8-7-2012 from http://www.reddit.com/r/dailyprogrammer/comments/xq0yv/832012_challenge_85_easy_rowcolumn_sorting/
 
-
 # get the array from STDIN
 arr = []
-ARGF.each { |line| arr << line.chomp!.scan(/\d+/).map { |s| s.to_i } }
+ARGF.each { |line| arr << line.chomp.scan(/\d+/).map { |s| s.to_i } }
 
 # transpose the array
 arr_t = arr.transpose
@@ -69,12 +68,11 @@ arr_t.sort! { |a,b| a.inject(:+) <=> b.inject(:+) }
 
 # print the matrixes sorted by row/col sums 
 arr.each do |a|
-  a.each { |i| printf (" " + i.to_s).ljust(4) }
+  a.each { |i| printf i.to_s.ljust(4) }
   printf "\n"
 end
 printf "\n"
 arr_t.transpose.each do |a|
-  a.each { |i| printf (" " + i.to_s).ljust(4) }
+  a.each { |i| printf i.to_s.ljust(4) }
   printf "\n"
 end
-
