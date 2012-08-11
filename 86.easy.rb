@@ -18,10 +18,22 @@
 
 input = "Heeeeelllllooooo nurse!"
 
-def encode(input)
+# the scan and regex produces pairs that have
+# to be married, the first matching character
+# and any characters following it.
+def encode_scan(input)
   input.scan(/(.)(\1*)/).map do |arr|
     grp = arr.first + arr.last
     [grp.length, arr.first]
+  end
+end
+
+# this regex is a little cuter, and the use of 
+# the gsub allows iterating over the resulting
+# enumerator
+def encode_gsub(input)
+  input.gsub(/((.)\2*)/).inject([]) do |arr,grp|
+    arr << [grp.length, grp[0]]
   end
 end
 
@@ -29,6 +41,8 @@ def decode(input)
   input.inject("") { |str,arr| str << arr.last * arr.first }
 end
 
-puts encode(input).inspect
-puts decode(encode(input)) == input
+puts encode_scan(input).inspect
+puts decode(encode_scan(input)) == input
 
+puts encode_gsub(input).inspect
+puts decode(encode_gsub(input)) == input
