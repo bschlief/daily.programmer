@@ -43,10 +43,10 @@ plain = "THECAKEISALIE"
 key = "GLADOS"
 
 def f(p,k,code=:+)
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
+  ("A".."Z").to_a.join[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
 end
 
-def encode(plain, key, code)
+def encode(plain, key, code=:+)
   plain_arr = plain.upcase.split(//)
   key_arr = key.upcase.split(//)
   plain_arr.map do |p|
@@ -56,11 +56,17 @@ def encode(plain, key, code)
   end.join
 end
 
+def decode(cipher, key, code=:-)
+  encode(cipher, key, code)
+end
+
 puts plain
-puts encode(plain,key, :+)
+cipher = encode(plain,key)
+plain2 = decode(cipher,key)
+puts plain2
 
 cipher = "HSULAREFOTXNMYNJOUZWYILGPRYZQVBBZABLBWHMFGWFVPMYWAVVTYISCIZRLVGOPGBRAKLUGJUZGLNBASTUQAGAVDZIGZFFWVLZSAZRGPVXUCUZBYLRXZSAZRYIHMIMTOJBZFZDEYMFPMAGSMUGBHUVYTSABBAISKXVUCAQABLDETIFGICRVWEWHSWECBVJMQGPRIBYYMBSAPOFRIMOLBUXFIIMAGCEOFWOXHAKUZISYMAHUOKSWOVGBULIBPICYNBBXJXSIXRANNBTVGSNKR"
 key = "BEGINNING"
 
-puts encode(cipher, key, :-)
+puts decode(cipher, key)
 
