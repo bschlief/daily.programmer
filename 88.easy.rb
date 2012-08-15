@@ -39,11 +39,12 @@
 # on 8-13-2012
 #
 
-plain = "THECAKEISALIE"
-key = "GLADOS"
+require 'Benchmark'
+require 'test/unit'
 
 def f(p,k,code=:+)
-  ("A".."Z").to_a.join[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
+  idx = (p.ord.send(code,k.ord) - 130) % 26 # 130 = 2*"A".ord
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[idx]
 end
 
 def encode(plain, key, code=:+)
@@ -60,13 +61,22 @@ def decode(cipher, key, code=:-)
   encode(cipher, key, code)
 end
 
-puts plain
-cipher = encode(plain,key)
-plain2 = decode(cipher,key)
-puts plain2
-
 cipher = "HSULAREFOTXNMYNJOUZWYILGPRYZQVBBZABLBWHMFGWFVPMYWAVVTYISCIZRLVGOPGBRAKLUGJUZGLNBASTUQAGAVDZIGZFFWVLZSAZRGPVXUCUZBYLRXZSAZRYIHMIMTOJBZFZDEYMFPMAGSMUGBHUVYTSABBAISKXVUCAQABLDETIFGICRVWEWHSWECBVJMQGPRIBYYMBSAPOFRIMOLBUXFIIMAGCEOFWOXHAKUZISYMAHUOKSWOVGBULIBPICYNBBXJXSIXRANNBTVGSNKR"
 key = "BEGINNING"
+plain = "THECAKEISALIE"
 
-puts decode(cipher, key)
+Benchmark.bmbm do |x|
+  x.report("Encode/decode") { (0..1000).each { encode(decode(cipher, key),key) } }
+end
+
+class TestAdd < Test::Unit::TestCase
+  def test_encode_decode
+    assert_equal(encode(decode("THISISATEST","MYKEY"),"MYKEY"), "THISISATEST")
+  end
+
+  def test_decode_encode
+    assert_equal(decode(encode("THISISATEST","MYKEY"),"MYKEY"), "THISISATEST")
+  end
+end
+
 
