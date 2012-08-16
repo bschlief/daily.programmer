@@ -43,7 +43,7 @@ require 'Benchmark'
 require 'test/unit'
 
 def f(p,k,code=:+)
-  idx = (p.ord.send(code,k.ord) - 130) % 26 # 130 = 2*"A".ord
+  idx = (p.ord.send(code,k.ord) - 130) % 26 # 130 = 2*"A".ord, 26 = strlen
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[idx]
 end
 
