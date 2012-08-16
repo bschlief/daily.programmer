@@ -47,6 +47,10 @@ def f(p,k,code=:+)
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[idx]
 end
 
+def g(set,p,k,code=:+)
+  set[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
+end
+
 def encode(plain, key, code=:+)
   plain_arr = plain.upcase.split(//)
   key_arr = key.upcase.split(//)
@@ -54,6 +58,26 @@ def encode(plain, key, code=:+)
     k=key_arr.first
     key_arr.rotate!
     f(p,k,code)  
+  end.join
+end
+
+def encodeWithIndex(plain, key, code=:+)
+  plain_arr = plain.upcase.split(//)
+  index = 0
+  plain_arr.map do |p|
+    k = key[index % key.length]
+    index += 1
+    f(p,k,code)  
+  end.join
+end
+def encodeWithIndexAndStatic(plain, key, code=:+)
+  plain_arr = plain.upcase.split(//)
+  set = ("A".."Z").to_a.join
+  index = 0
+  plain_arr.map do |p|
+    k = key[index % key.length]
+    index += 1
+    g(set,p,k,code)  
   end.join
 end
 
