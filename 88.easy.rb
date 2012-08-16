@@ -47,37 +47,15 @@ def f(p,k,code=:+)
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[idx]
 end
 
-def g(set,p,k,code=:+)
+def g(p,k,set,code=:+)
   set[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
 end
 
 def encode(plain, key, code=:+)
   plain_arr = plain.upcase.split(//)
   key_arr = key.upcase.split(//)
-  plain_arr.map do |p|
-    k=key_arr.first
-    key_arr.rotate!
-    f(p,k,code)  
-  end.join
-end
-
-def encodeWithIndex(plain, key, code=:+)
-  plain_arr = plain.upcase.split(//)
-  index = 0
-  plain_arr.map do |p|
-    k = key[index % key.length]
-    index += 1
-    f(p,k,code)  
-  end.join
-end
-def encodeWithIndexAndStatic(plain, key, code=:+)
-  plain_arr = plain.upcase.split(//)
-  set = ("A".."Z").to_a.join
-  index = 0
-  plain_arr.map do |p|
-    k = key[index % key.length]
-    index += 1
-    g(set,p,k,code)  
+  plain_arr.each_with_index.map do |p,i|
+    f(p,key_arr[i%key_arr.length],code)
   end.join
 end
 
@@ -85,12 +63,28 @@ def decode(cipher, key, code=:-)
   encode(cipher, key, code)
 end
 
+def encode_g(plain, key, code=:+)
+  plain_arr = plain.upcase.split(//)
+  key_arr = key.upcase.split(//)
+  set = ("A".."Z").to_a.join
+  plain_arr.each_with_index.map do |p,i|
+    g(p,key_arr[i%key_arr.length],set,code)
+  end.join
+end
+
+def decode_g(cipher, key, code=:-)
+  encode_g(cipher, key, code)
+end
+
+
 cipher = "HSULAREFOTXNMYNJOUZWYILGPRYZQVBBZABLBWHMFGWFVPMYWAVVTYISCIZRLVGOPGBRAKLUGJUZGLNBASTUQAGAVDZIGZFFWVLZSAZRGPVXUCUZBYLRXZSAZRYIHMIMTOJBZFZDEYMFPMAGSMUGBHUVYTSABBAISKXVUCAQABLDETIFGICRVWEWHSWECBVJMQGPRIBYYMBSAPOFRIMOLBUXFIIMAGCEOFWOXHAKUZISYMAHUOKSWOVGBULIBPICYNBBXJXSIXRANNBTVGSNKR"
-key = "BEGINNING"
 plain = "THECAKEISALIE"
+key = "GLADOS"
+
 
 Benchmark.bmbm do |x|
-  x.report("Encode/decode") { (0..1000).each { encode(decode(cipher, key),key) } }
+  x.report("Encode/decode with 'f'") { (0..10000).each { encode(decode(cipher, key),key) } }
+  x.report("Encode/decode with 'g'") { (0..10000).each { encode_g(decode_g(cipher, key),key) } }
 end
 
 class TestAdd < Test::Unit::TestCase
@@ -101,6 +95,15 @@ class TestAdd < Test::Unit::TestCase
   def test_decode_encode
     assert_equal(decode(encode("THISISATEST","MYKEY"),"MYKEY"), "THISISATEST")
   end
+
+  def test_encode
+    assert_equal(encode("THECAKEISALIE", "GLADOS"), "ZSEFOCKTSDZAK")
+  end
+
+  def test_decode
+    assert_equal(decode("ZSEFOCKTSDZAK", "GLADOS"), "THECAKEISALIE")
+  end
+
 end
 
 
