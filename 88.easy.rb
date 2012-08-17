@@ -39,7 +39,7 @@
 # on 8-13-2012
 #
 
-require 'Benchmark'
+require 'benchmark'
 require 'test/unit'
 
 def f(p,k,code=:+)
@@ -47,63 +47,63 @@ def f(p,k,code=:+)
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[idx]
 end
 
-def g(p,k,set,code=:+)
-  set[(p.ord.method(code).call(k.ord)-(2*"A".ord))%26]
+def g(p,k,code=:+)
+  (((p.ord.send(code,k.ord) - 130) % 26)+65).chr
 end
 
-def encode(plain, key, code=:+)
+def encode(plain, key, func, code=:+)
   plain_arr = plain.upcase.split(//)
   key_arr = key.upcase.split(//)
   plain_arr.each_with_index.map do |p,i|
-    f(p,key_arr[i%key_arr.length],code)
+    send(func,p,key_arr[i%key_arr.length],code)
   end.join
 end
 
-def decode(cipher, key, code=:-)
-  encode(cipher, key, code)
+def decode(cipher, key, func, code=:-)
+  encode(cipher, key, func, code)
 end
-
-def encode_g(plain, key, code=:+)
-  plain_arr = plain.upcase.split(//)
-  key_arr = key.upcase.split(//)
-  set = ("A".."Z").to_a.join
-  plain_arr.each_with_index.map do |p,i|
-    g(p,key_arr[i%key_arr.length],set,code)
-  end.join
-end
-
-def decode_g(cipher, key, code=:-)
-  encode_g(cipher, key, code)
-end
-
 
 cipher = "HSULAREFOTXNMYNJOUZWYILGPRYZQVBBZABLBWHMFGWFVPMYWAVVTYISCIZRLVGOPGBRAKLUGJUZGLNBASTUQAGAVDZIGZFFWVLZSAZRGPVXUCUZBYLRXZSAZRYIHMIMTOJBZFZDEYMFPMAGSMUGBHUVYTSABBAISKXVUCAQABLDETIFGICRVWEWHSWECBVJMQGPRIBYYMBSAPOFRIMOLBUXFIIMAGCEOFWOXHAKUZISYMAHUOKSWOVGBULIBPICYNBBXJXSIXRANNBTVGSNKR"
 plain = "THECAKEISALIE"
 key = "GLADOS"
 
-
-Benchmark.bmbm do |x|
-  x.report("Encode/decode with 'f'") { (0..10000).each { encode(decode(cipher, key),key) } }
-  x.report("Encode/decode with 'g'") { (0..10000).each { encode_g(decode_g(cipher, key),key) } }
+Benchmark.bm do |x|
+  x.report("Encode/decode with 'f'") { (0..1000).each { encode(decode(cipher, key,:f),key,:f) } }
+  x.report("Encode/decode with 'g'") { (0..1000).each { encode(decode(cipher, key,:g),key,:g) } }
 end
 
 class TestAdd < Test::Unit::TestCase
-  def test_encode_decode
-    assert_equal(encode(decode("THISISATEST","MYKEY"),"MYKEY"), "THISISATEST")
+  def test_encode_decode_f
+    assert_equal("THISISATEST", encode(decode("THISISATEST","MYKEY", :f),"MYKEY", :f))
   end
 
-  def test_decode_encode
-    assert_equal(decode(encode("THISISATEST","MYKEY"),"MYKEY"), "THISISATEST")
+  def test_encode_decode_g
+    assert_equal("THISISATEST", encode(decode("THISISATEST","MYKEY", :g),"MYKEY", :g))
   end
 
-  def test_encode
-    assert_equal(encode("THECAKEISALIE", "GLADOS"), "ZSEFOCKTSDZAK")
+  def test_decode_encode_f
+   assert_equal("THISISATEST", decode(encode("THISISATEST","MYKEY", :f),"MYKEY", :f))
   end
 
-  def test_decode
-    assert_equal(decode("ZSEFOCKTSDZAK", "GLADOS"), "THECAKEISALIE")
+  def test_decode_encode_g
+   assert_equal("THISISATEST", decode(encode("THISISATEST","MYKEY", :g),"MYKEY", :g))
   end
 
+  def test_encode_f
+    assert_equal("ZSEFOCKTSDZAK", encode("THECAKEISALIE", "GLADOS", :f))
+  end
+
+  def test_encode_g
+    assert_equal("ZSEFOCKTSDZAK", encode("THECAKEISALIE", "GLADOS", :g))
+  end
+
+  def test_decode_f
+    assert_equal("THECAKEISALIE", decode("ZSEFOCKTSDZAK", "GLADOS", :f))
+  end
+
+  def test_decode_g
+    assert_equal("THECAKEISALIE", decode("ZSEFOCKTSDZAK", "GLADOS", :g))
+  end
 end
 
 
