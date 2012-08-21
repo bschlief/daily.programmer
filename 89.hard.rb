@@ -46,28 +46,43 @@
 require 'rexml/document'
 include REXML
 
-########################################
 # get_color(borders, color_map, state)
 # borders   -- hash where key=state, values=array of boarding states
 # color_map -- hash where key=state, value=color value for that state
 # state     -- which state to try to color
+$all_cols =  [ 'ff0000', 'ff7f00', 'ffc125', '006400', '1874cd', 'bf3eff', 'f8feff', '000000', nil ]
 def get_color(borders, color_map, state)
-  all_cols =  [ 'RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'PURPLE', 'WHITE', 'BLACK', nil ]
   border_colors = borders[state].map { |c| color_map[c] }
-  (all_cols - border_colors).first
+  ($all_cols - border_colors).first
 end
 
 # Split on <-, then on commas to create borders hash
 borders = {}
 IO.readlines('data/89.hard.input.txt').map do |line| 
   key,tail = line.gsub(/\s+/,'').split(/<-/)
-  borders[key] = tail.split(/,/)
+  borders[key] = tail.split(/,/) 
 end
 
 # color_map will contain state => color values for all states
-# after this each loop.
-color_map = {}
-borders.keys.shuffle.each { |state| color_map[state] = get_color(borders,color_map,state) }
+# after this each loop. the number of uniq values for state
+# colors must be 4 or less to be considered cute. 
+begin 
+  color_map = { "AK" => $all_cols[0], "HI" => $all_cols[1] }
+  borders.keys.shuffle.each do |state| 
+    color_map[state] = get_color(borders,color_map,state) 
+    (color_map["MI-"] = color_map["MI"]) if state == "MI"
+    (color_map["SP-"] = color_map["MI"]) if state == "MI"
+  end
+end while color_map.values.uniq.length > 4
 
+
+# Look for ids matching states, and replace the color with 
+# what's in the color map.
 doc = Document.new File.new ('data/Blank_US_Map.svg') 
-doc.elements.each('path') { |element| puts element.attributes['id'] }
+XPath.each(doc, "//path") do |path_element| 
+  id = path_element.attributes['id']
+  col = color_map[id]
+  path_element.attributes['style'] = "fill:\##{col};stroke:#ffffff;stroke-opacity:1;stroke-width:0.75;stroke-miterlimit:4;stroke-dasharray:none" unless col.nil?
+end
+
+doc.write($stdout, 0)

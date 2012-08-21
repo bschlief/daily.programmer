@@ -1,3 +1,4 @@
+DC <- VA, MD
 WA <- OR, ID
 DE <- MD, PA, NJ
 WI <- MI, IL, IA, MN
