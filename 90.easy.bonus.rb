@@ -36,16 +36,17 @@ grid = ARGF.readlines.map { |line| line.chomp.split(/\s+/) }
 res = ''
 grid.each_with_index do |item, idx|
   (dir = 'E') if idx.even? 
-  (dir = 'W') if idx.odd?
-  (item = item.reverse) if idx.odd?  
 
-  item.each do |c|
-    res << ((c == '1') ? "P#{dir}" : "#{dir}")
+  if idx.odd?
+    dir = 'W'
+    item.reverse!
   end
-  res.chop! << 'S'
+
+  item.each { |c| res << ((c == '1') ? "P#{dir}" : "#{dir}") }  
+  res.chop! << 'S' #=> replace last movement with a down
 end
 
-res.chop!
+res.chop! #=> remove last movment, which would be out of bounds
 
 puts res
 

@@ -36,7 +36,7 @@ walk.each_char do |c|
   x -= 1        if c == 'W'
   y += 1        if c == 'S'
   y -= 1        if c == 'N'
-  grid[x][y] = 1 if c == 'P'
+  grid[y][x] = 1 if c == 'P'
 end
 
 puts "P1"
