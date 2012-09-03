@@ -24,28 +24,29 @@
 # Retreived Aug 22, 2012
 
 # get the array from STDIN
-input = ARGF.inject('') { |res,line|  res += line.chomp }.split(/\s+/)
 
-rows, cols, walk = input.shift.to_i, input.shift.to_i, input.shift
+ARGF.readline #=> Throw away "P1"
+ARGF.readline #=> Throw away Comments
+rows, cols = ARGF.readline.split(/\s+/).map { |i| i.to_i }
 
-grid = Array.new(rows) { Array.new(cols, 0) }
-x = y = 0
+printf "#{rows} #{cols} "
 
-walk.each_char do |c|
-  x += 1        if c == 'E'
-  x -= 1        if c == 'W'
-  y += 1        if c == 'S'
-  y -= 1        if c == 'N'
-  grid[y][x] = 1 if c == 'P'
+grid = ARGF.readlines.map { |line| line.chomp.split(/\s+/) }
+
+res = ''
+grid.each_with_index do |item, idx|
+  (dir = 'E') if idx.even? 
+
+  if idx.odd?
+    dir = 'W'
+    item.reverse!
+  end
+
+  item.each { |c| res << ((c == '1') ? "P#{dir}" : "#{dir}") }  
+  res.chop! << 'S' #=> replace last movement with a down
 end
 
-puts "P1"
-puts "#This is a PBM, Portable Bitmap File"
-puts "#{rows} #{cols}"
-(0...rows).each do |r| 
-  (0...cols).each do |c| 
-    printf "#{grid[r][c]} "
-  end 
-  printf "\n"
-end
+res.chop! #=> remove last movment, which would be out of bounds
+
+puts res
 
