@@ -36,5 +36,5 @@ def sent(letters, word_lens, sent_lens, punctuation)
   words.join(' ')
 end
 
-(0...15).each { printf sent(letters, word_lens, sent_lens, punctuation) }
+(0...80).each { printf sent(letters, word_lens, sent_lens, punctuation) }
 puts ""
