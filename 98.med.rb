@@ -17,6 +17,8 @@
 
 #What is the result of multiple_count(1000000000, [5395, 7168, 2367, 9999, 3])?
 
+require 'benchmark'
+
 def multiple_count(lim, ints)
   cnt = 0
   cyc = ints.cycle
@@ -30,5 +32,7 @@ def multiple_count(lim, ints)
   cnt
 end
 
-puts "What is the result of multiple_count(1000000000,[5395,7168,2367,9999,3])? #{multiple_count(1000000000,[5395, 7168, 2367, 9999, 3])}"
+Benchmark.bm do |x|
+  x.report("Big test") {puts "What is the result of multiple_count(1000000000,[5395,7168,2367,9999,3])? #{multiple_count(1000000000,[5395, 7168, 2367, 9999, 3])}"}
+end
 
