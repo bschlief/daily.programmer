@@ -47,48 +47,32 @@
 
 % entry point
     main(_) ->
-        hex_to_bitmap(),
-        io:format("\n").
+        hex_to_bitmap(io:get_chars('', 8192)).
 
-    hex_to_bitmap() ->
-      case io:get_chars('', 8192) of
-        eof -> init:stop();
-      Text ->
-        [hex_to_bitmap(C) || C <- Text],
-        hex_to_bitmap()
-    end.
+    hex_to_bitmap([H|T]) ->
+        hex_to_bitmap(H),
+        hex_to_bitmap(T);
+    hex_to_bitmap(C) when C >= $0, C =< $9;
+                          C >= $A, C =< $F ->
+        print_hex(C);
+    hex_to_bitmap(C) when C =:= $\s ->
+        io:fwrite("\n");
+    hex_to_bitmap(C) when C =:= $\n ->
+        io:fwrite("\n\n");
+    hex_to_bitmap([]) ->
+        init:stop().
 
-    hex_to_bitmap($0) ->
-        io:format("    ");
-    hex_to_bitmap($1) ->
-        io:format("   *");
-    hex_to_bitmap($2) ->
-        io:format("  * ");
-    hex_to_bitmap($3) ->
-        io:format("  **");
-    hex_to_bitmap($4) ->
-        io:format(" *  ");
-    hex_to_bitmap($5) ->
-        io:format(" * *");
-    hex_to_bitmap($6) ->
-        io:format(" ** ");
-    hex_to_bitmap($7) ->
-        io:format(" ***");
-    hex_to_bitmap($8) ->
-        io:format("*   ");
-    hex_to_bitmap($9) ->
-        io:format("*  *");
-    hex_to_bitmap($A) ->
-        io:format("* * ");
-    hex_to_bitmap($B) ->
-        io:format("* **");
-    hex_to_bitmap($C) ->
-        io:format("**  ");
-    hex_to_bitmap($D) ->
-        io:format("** *");
-    hex_to_bitmap($E) ->
-        io:format("*** ");
-    hex_to_bitmap($F) ->
-        io:format("****");
-    hex_to_bitmap(_) ->
-        io:format("\n", []).
+    print_hex(C) ->
+        Integer = list_to_integer([C], 16),
+        BinaryString = io_lib:format("~4.2.0B", [Integer]),
+        print_binary(BinaryString).
+
+    print_binary([X|Tail]) ->
+      print_binary(X),
+      print_binary(Tail);
+    print_binary($1) ->
+      io:fwrite("X");
+    print_binary($0) ->
+      io:fwrite(" ");
+    print_binary([]) ->
+      noop.
